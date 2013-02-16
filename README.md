@@ -4,6 +4,8 @@ Composer Wrapper
 This project aims to provide a way to use composer from within a script,
 even if it is not installed.
     
+[![Build Status](https://travis-ci.org/eviweb/composer-wrapper.png?branch=master)](https://travis-ci.org/eviweb/composer-wrapper)
+    
 How to install :
 ----------------
 You can choose between :    
