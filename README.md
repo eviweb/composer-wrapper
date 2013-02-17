@@ -11,7 +11,7 @@ How to install :
 You can choose between :    
 1.    clone this repo ```git clone https://github.com/eviweb/composer-wrapper.git```    
 2.    use composer by adding ```"eviweb/composer-wrapper" : "1.*"``` to the _require_ section of your _composer.json_    
-3.    directly download the [Wrapper.php](https://raw.github.com/eviweb/composer-wrapper/develop/src/evidev/composer/Wrapper.php)   
+3.    directly download the [Wrapper.php](https://raw.github.com/eviweb/composer-wrapper/master/src/evidev/composer/Wrapper.php)   
 4.    dynamic install _see below_
     
 How to use :
@@ -35,7 +35,7 @@ require_once 'PATH_TO_COMPOSER_WRAPPER_FILE';
 >        if (!file_exists($wrapper_file)) {
 >             file_put_contents(
 >                 $wrapper_file,
->                 file_get_contents('https://raw.github.com/eviweb/composer-wrapper/develop/src/evidev/composer/Wrapper.php')
+>                 file_get_contents('https://raw.github.com/eviweb/composer-wrapper/master/src/evidev/composer/Wrapper.php')
 >             );
 >        }
 >        require_once $wrapper_file;    
