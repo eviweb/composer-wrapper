@@ -44,13 +44,43 @@ use \evidev\composer\Wrapper;
 class WrapperTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * associative array of needed files
+     * 
+     * @var array
+     */
+    protected static $files;
+    
+    /**
+     * initializes the test environment
+     */
+    public static function setUpBeforeClass()
+    {
+        static::$files = array(
+            'composer'  => sys_get_temp_dir().'/composer.phar',
+            'stream'    => sys_get_temp_dir().'/wrapper-unittest.stream',
+        );
+    }
+    
+    /**
+     * clears the test environment
+     */
+    public static function tearDownAfterClass()
+    {
+        foreach(static::$files as $file) {
+            if (file_exists($file)) {
+                unlink($file);
+            }
+        }
+    }
+    
+    /**
      * @covers \evidev\composer\Wrapper::create
      */
     public function testCreate()
     {
         $cw = Wrapper::create();
         $this->assertInstanceOf('\\evidev\\composer\\Wrapper', $cw);
-        $this->assertFileExists(sys_get_temp_dir().'/composer.phar');
+        $this->assertFileExists(static::$files['composer']);
     }
 
     /**
@@ -58,7 +88,7 @@ class WrapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testRun()
     {
-        $file = sys_get_temp_dir().'/wrapper-unittest.stream';
+        $file = static::$files['stream'];
         $cw = Wrapper::create();
         $rs = fopen($file, 'w', false);
         $stream = new \Symfony\Component\Console\Output\StreamOutput($rs);        
@@ -66,6 +96,23 @@ class WrapperTest extends \PHPUnit_Framework_TestCase
         fclose($rs);
         $this->assertTrue(
             (boolean) preg_match('/^Composer version/', file_get_contents($file))
-        );        
+        );
+    }
+    
+    /**
+     * @covers \evidev\composer\Wrapper::run
+     */
+    public function testCLIRun()
+    {
+        $_SERVER['argv'][] = '-V';
+        $file = static::$files['stream'];
+        $cw = Wrapper::create();
+        $rs = fopen($file, 'w', false);
+        $stream = new \Symfony\Component\Console\Output\StreamOutput($rs);        
+        $this->assertEquals(0, $cw->run("", $stream));
+        fclose($rs);
+        $this->assertTrue(
+            (boolean) preg_match('/^Composer version/', file_get_contents($file))
+        );
     }
 }
