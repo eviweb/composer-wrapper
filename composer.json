@@ -20,5 +20,10 @@
         "psr-0": {
             "evidev": "src/"
         }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
     }
 }
