@@ -127,9 +127,13 @@ final class Wrapper
      * @see http://api.symfony.com/2.2/Symfony/Component/Console/Application.html#method_run     
      */
     public function run($input = '', $output = null)
-    {        
+    {
+        $cli_args = is_string($input) && !empty($input) ?
+                new \Symfony\Component\Console\Input\StringInput($input) :
+                null;
+          
         return $this->application->run(
-            new \Symfony\Component\Console\Input\StringInput($input),
+            $cli_args,
             $output
         );
     }
