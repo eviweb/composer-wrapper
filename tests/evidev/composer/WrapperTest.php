@@ -56,8 +56,9 @@ class WrapperTest extends \PHPUnit_Framework_TestCase
     public static function setUpBeforeClass()
     {
         static::$files = array(
-            'composer'  => sys_get_temp_dir().'/composer.phar',
-            'stream'    => sys_get_temp_dir().'/wrapper-unittest.stream',
+            'composer'          => sys_get_temp_dir().'/composer.phar',
+            'other_composer'    => sys_get_temp_dir().'/other/dir/composer.phar',
+            'stream'            => sys_get_temp_dir().'/wrapper-unittest.stream',
         );
     }
     
@@ -71,6 +72,14 @@ class WrapperTest extends \PHPUnit_Framework_TestCase
                 unlink($file);
             }
         }
+        $dir = sys_get_temp_dir().'/other/dir';
+        if (file_exists($dir)) {
+            rmdir($dir);
+        }
+        $dir = sys_get_temp_dir().'/other';
+        if (file_exists($dir)) {
+            rmdir($dir);
+        }
     }
     
     /**
@@ -82,7 +91,33 @@ class WrapperTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\\evidev\\composer\\Wrapper', $cw);
         $this->assertFileExists(static::$files['composer']);
     }
+    
+    /**
+     * @covers \evidev\composer\Wrapper::create
+     */
+    public function testCreateInNonExistingDirectory()
+    {
+        static::tearDownAfterClass();
+        $dir = dirname(static::$files['other_composer']);
+        $this->assertFileNotExists($dir);
+        $cw2 = Wrapper::create($dir);
+        $this->assertFileNotExists(static::$files['other_composer']);
+        $this->assertFileExists(static::$files['composer']);
+    }
 
+    /**
+     * @covers \evidev\composer\Wrapper::create
+     */
+    public function testCreateInExistingSpecifiedDirectory()
+    {
+        static::tearDownAfterClass();
+        $dir = dirname(static::$files['other_composer']);
+        $this->assertTrue(mkdir($dir, 0777, true));
+        $cw2 = Wrapper::create($dir);
+        $this->assertFileNotExists(static::$files['composer']);
+        $this->assertFileExists(static::$files['other_composer']);
+    }
+    
     /**
      * @covers \evidev\composer\Wrapper::run
      */

@@ -64,10 +64,12 @@ final class Wrapper
 
     /**
      * constructor
+     * 
+     * @param   string  $directory  target directory where to copy composer.phar
      */
-    private function __construct()
+    private function __construct($directory)
     {
-        $this->composer = sys_get_temp_dir() . '/composer.phar';
+        $this->composer = $directory . '/composer.phar';
         if (!file_exists($this->composer)) {
             file_put_contents($this->composer, file_get_contents(static::PHAR_URL));
         }
@@ -103,7 +105,9 @@ final class Wrapper
         }
 
         //
-        require_once 'phar://' . $this->composer . '/src/bootstrap.php';        
+        if (!function_exists('includeIfExists')) {
+            require_once 'phar://' . $this->composer . '/src/bootstrap.php';
+        }
         $this->application = new \Composer\Console\Application();
         $this->application->setAutoExit(false);
     }
@@ -111,11 +115,18 @@ final class Wrapper
     /**
      * factory method
      * 
+     * @param   string  $directory  target directory where to copy composer.phar
+     *                              if it is not provided or if the directory
+     *                              does not exist, it is initialized using
+     *                              sys_get_temp_dir()
      * @return \evidev\composer\Wrapper
      */
-    public static function create()
+    public static function create($directory = '')
     {
-        return new Wrapper();
+        if (empty($directory) || !file_exists($directory)) {
+            $directory = sys_get_temp_dir();
+        }
+        return new Wrapper($directory);
     }
 
     /**
