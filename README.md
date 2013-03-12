@@ -51,3 +51,11 @@ require_once 'PATH_TO_COMPOSER_WRAPPER_FILE';
 >        exit($exit_code);    
      
 where _COMPOSER_OPTION_OR_COMMAND_AS_STRING_ is a composer option or command
+     
+### How it works    
+The Wrapper downloads the ```composer.phar``` file when created.    
+By default the ```composer.phar``` is downloaded in ```sys_get_temp_dir()```, but you can specify a target directory 
+by passing its path as a parameter of ```Wrapper::create()```.    
+If this parameter is an empty string or if the directory does not exist, ```sys_get_temp_dir()``` is used as fallback    
+In case of use of many instances of the Wrapper, created with different directories _(which should never happened)_, 
+the first downloaded ```composer.phar``` is used.    
