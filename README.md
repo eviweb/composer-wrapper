@@ -45,7 +45,7 @@ require_once 'PATH_TO_COMPOSER_WRAPPER_FILE';
 1.    for a command line use, simply add ```exit(\evidev\composer\Wrapper::create()->run());``` to your executable script    
 2.    if you want to use it in the body of your script, and pass specific arguments to the _Wrapper::run()_ method you need to do as the following :    
     
->        $wc = new \evidev\composer\Wrapper::create();
+>        $wc = \evidev\composer\Wrapper::create();
 >        $exit_code = $wc->run("COMPOSER_OPTION_OR_COMMAND_AS_STRING");
 >        // add more code here for example
 >        exit($exit_code);    
