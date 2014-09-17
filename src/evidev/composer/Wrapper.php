@@ -45,7 +45,6 @@ final class Wrapper
     /**
      * url from where to get the composer phar archive
      */
-
     const PHAR_URL = 'https://getcomposer.org/composer.phar';
 
     /**
@@ -66,12 +65,7 @@ final class Wrapper
         if (!file_exists($this->composer)) {
             file_put_contents($this->composer, file_get_contents(static::PHAR_URL));
         }
-        // this part has been directly taken from the bin/composer file
-        error_reporting(-1);
-
-        if (function_exists('ini_set')) {
-            @ini_set('display_errors', 1);
-
+        if (function_exists('ini_get')) {
             $memoryInBytes = function ($value) {
                     $unit = strtolower(substr($value, -1, 1));
                     $value = (int) $value;
@@ -92,12 +86,14 @@ final class Wrapper
             $memoryLimit = trim(ini_get('memory_limit'));
             // Increase memory_limit if it is lower than 512M
             if ($memoryLimit != -1 && $memoryInBytes($memoryLimit) < 512 * 1024 * 1024) {
-                @ini_set('memory_limit', '512M');
+                trigger_error("Configured memory limit ($memoryLimit) is lower " .
+                              "than 512M; composer-wrapper may not work " .
+                              "correctly. Consider increasing PHP's " .
+                              "memory_limit to at least 512M.",
+                              E_USER_NOTICE);
             }
-            unset($memoryInBytes, $memoryLimit);
         }
 
-        //
         if (!function_exists('includeIfExists')) {
             require_once 'phar://' . $this->composer . '/src/bootstrap.php';
         }
