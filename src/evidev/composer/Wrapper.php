@@ -56,13 +56,6 @@ final class Wrapper
     private $composer;
 
     /**
-     * composer application instance
-     * 
-     * @var Composer\Console\Application 
-     */
-    private $application;
-
-    /**
      * constructor
      *
      * @param   string  $directory  target directory where to copy composer.phar
@@ -108,8 +101,6 @@ final class Wrapper
         if (!function_exists('includeIfExists')) {
             require_once 'phar://' . $this->composer . '/src/bootstrap.php';
         }
-        $this->application = new \Composer\Console\Application();
-        $this->application->setAutoExit(false);
     }
 
     /**
@@ -145,7 +136,7 @@ final class Wrapper
                 new \Symfony\Component\Console\Input\StringInput($input) :
                 null;
 
-        return $this->application->run(
+        return $application->run(
             $cli_args,
             $output
         );
