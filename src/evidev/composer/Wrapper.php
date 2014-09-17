@@ -109,7 +109,7 @@ final class Wrapper
     }
 
     /**
-     * factory method
+     * Factory method.
      *
      * @param   string  $directory  target directory where to copy composer.phar
      *                              if it is not provided or if the directory
@@ -126,7 +126,7 @@ final class Wrapper
     }
 
     /**
-     * runs composer application
+     * Run this composer wrapper as a command-line application.
      *
      * @param   string  $input  command line arguments
      * @param   object  $output output object
@@ -137,6 +137,7 @@ final class Wrapper
     {
         $application = new \Composer\Console\Application();
         $application->setAutoExit(false);
+
         $cli_args = is_string($input) && !empty($input) ?
                 new \Symfony\Component\Console\Input\StringInput($input) :
                 null;
