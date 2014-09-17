@@ -23,10 +23,10 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- * 
+ *
  * @package     evidev\composer
  * @author      Eric VILLARD <dev@eviweb.fr>
- * @copyright	(c) 2013 Eric VILLARD <dev@eviweb.fr>
+ * @copyright   (c) 2013 Eric VILLARD <dev@eviweb.fr>
  * @license     http://opensource.org/licenses/MIT MIT License
  */
 
@@ -34,10 +34,10 @@ namespace evidev\composer;
 
 /**
  * composer wrapper class
- * 
+ *
  * @package     evidev\composer
  * @author      Eric VILLARD <dev@eviweb.fr>
- * @copyright	(c) 2012 Eric VILLARD <dev@eviweb.fr>
+ * @copyright   (c) 2012 Eric VILLARD <dev@eviweb.fr>
  * @license     http://opensource.org/licenses/MIT MIT License
  */
 final class Wrapper
@@ -50,7 +50,7 @@ final class Wrapper
 
     /**
      * composer executable path
-     * 
+     *
      * @var string
      */
     private $composer;
@@ -64,7 +64,7 @@ final class Wrapper
 
     /**
      * constructor
-     * 
+     *
      * @param   string  $directory  target directory where to copy composer.phar
      */
     private function __construct($directory)
@@ -114,7 +114,7 @@ final class Wrapper
 
     /**
      * factory method
-     * 
+     *
      * @param   string  $directory  target directory where to copy composer.phar
      *                              if it is not provided or if the directory
      *                              does not exist, it is initialized using
@@ -131,18 +131,20 @@ final class Wrapper
 
     /**
      * runs composer application
-     * 
+     *
      * @param   string  $input  command line arguments
      * @param   object  $output output object
      * @return  integer 0 if everything went fine, or an error code
-     * @see http://api.symfony.com/2.2/Symfony/Component/Console/Application.html#method_run     
+     * @see http://api.symfony.com/2.2/Symfony/Component/Console/Application.html#method_run
      */
     public function run($input = '', $output = null)
     {
+        $application = new \Composer\Console\Application();
+        $application->setAutoExit(false);
         $cli_args = is_string($input) && !empty($input) ?
                 new \Symfony\Component\Console\Input\StringInput($input) :
                 null;
-          
+
         return $this->application->run(
             $cli_args,
             $output
