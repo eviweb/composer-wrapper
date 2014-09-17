@@ -55,6 +55,14 @@ final class Wrapper
     private $composer;
 
     /**
+     * Command-line application, created on demand and kept around for future
+     * calls.
+     *
+     * @var \Composer\Console\Application
+     */
+    private $application;
+
+    /**
      * constructor
      *
      * @param   string  $directory  target directory where to copy composer.phar
@@ -106,6 +114,7 @@ final class Wrapper
         if (!function_exists('includeIfExists')) {
             require_once 'phar://' . $this->composer . '/src/bootstrap.php';
         }
+        $this->application = null;
     }
 
     /**
@@ -135,14 +144,16 @@ final class Wrapper
      */
     public function run($input = '', $output = null)
     {
-        $application = new \Composer\Console\Application();
-        $application->setAutoExit(false);
+        if (!$this->application) {
+            $this->application = new \Composer\Console\Application();
+            $this->application->setAutoExit(false);
+        }
 
         $cli_args = is_string($input) && !empty($input) ?
                 new \Symfony\Component\Console\Input\StringInput($input) :
                 null;
 
-        return $application->run(
+        return $this->application->run(
             $cli_args,
             $output
         );
