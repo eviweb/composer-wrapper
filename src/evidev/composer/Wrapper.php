@@ -63,16 +63,65 @@ final class Wrapper
     private $application;
 
     /**
-     * constructor
-     *
-     * @param   string  $directory  target directory where to copy composer.phar
+     * Keeps track of whether we've already taken care of downloading
+     * composer.phar.
      */
-    private function __construct($directory)
+    private $pharLoaded;
+
+    /**
+     * Connects to getcomposer.org to fetch the latest composer.phar.
+     * You don't normally need to call this directely, because the run() method
+     * takes care of it, but it may be useful to fix a corrupted composer.phar
+     * or force a fresh composer install.
+     *
+     * @param boolean $force TRUE to re-download composer.phar even if a valid
+     *    file already exists.
+     */
+    public function loadComposerPhar($force = true)
     {
-        $this->composer = $directory . '/composer.phar';
-        if (!file_exists($this->composer)) {
-            file_put_contents($this->composer, file_get_contents(static::PHAR_URL));
+        if (!$force && !$this->pharLoaded &&
+            file_exists($this->composer) &&
+            is_readable($this->composer) &&
+            filesize($this->composer)) {
+            return true;
         }
+
+        $this->pharLoaded = true;
+
+        $phar = file_get_contents(static::PHAR_URL);
+        if ($phar === false) {
+                trigger_error(
+                    "Downloading PHAR from getcomposer.org failed. " .
+                    "Make sure that URL-fopen is supported on this system, " .
+                    "and that your server has a working internet connection " .
+                    "allowing outbound HTTPS connections.",
+                    E_USER_WARNING);
+            return false;
+        }
+        if (empty($phar)) {
+            trigger_error(
+                    "PHAR downloaded from getcomposer.org is empty. "  .
+                    "There is no way this can work, but I don't know what " .
+                    " to do about it.",
+                    E_USER_WARNING);
+            return false;
+        }
+        $bytes_written = file_put_contents($this->composer, $phar);
+        if ($bytes_written === false) {
+            trigger_error(
+                    "Failed to write downloaded PHAR. ",
+                    E_USER_WARNING);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check whether the current setup meets the minimum memory requirements
+     * for composer; raise a notice if not.
+     */
+    private function checkMemoryLimit() {
         if (function_exists('ini_get')) {
             /**
              * Note that this calculation is incorrect for memory limits that
@@ -111,10 +160,34 @@ final class Wrapper
             }
         }
 
+    }
+
+    /**
+     * constructor
+     *
+     * @param   string  $directory  target directory where to copy composer.phar
+     */
+    private function __construct($directory)
+    {
+        $this->composer = $directory . '/composer.phar';
+        $this->application = null;
+        $this->pharLoaded = false;
+
+        if (!file_exists($this->composer) ||
+            !is_readable($this->composer) ||
+            !filesize($this->composer)) {
+                if (!$this->loadComposerPhar()) {
+                    // FIXME: downloading composer failed.
+                    // This needs to be handled somewhere, somehow...
+                    return;
+                }
+        }
+
+        $this->checkMemoryLimit();
+
         if (!function_exists('includeIfExists')) {
             require_once 'phar://' . $this->composer . '/src/bootstrap.php';
         }
-        $this->application = null;
     }
 
     /**
@@ -144,6 +217,7 @@ final class Wrapper
      */
     public function run($input = '', $output = null)
     {
+        $this->loadComposerPhar(false);
         if (!$this->application) {
             $this->application = new \Composer\Console\Application();
             $this->application->setAutoExit(false);
