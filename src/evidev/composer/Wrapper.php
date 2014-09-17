@@ -66,18 +66,27 @@ final class Wrapper
             file_put_contents($this->composer, file_get_contents(static::PHAR_URL));
         }
         if (function_exists('ini_get')) {
+            /**
+             * Note that this calculation is incorrect for memory limits that
+             * exceed the value range of the underlying platform's native
+             * integer.
+             * In practice, we will get away with it, because it doesn't make
+             * sense to configure PHP's memory limit to half the addressable
+             * RAM (2 GB on a typical 32-bit system).
+             */
             $memoryInBytes = function ($value) {
                     $unit = strtolower(substr($value, -1, 1));
                     $value = (int) $value;
                     switch ($unit) {
                         case 'g':
-                            $value *= 1024;
-                        // no break (cumulative multiplier)
+                            $value *= 1024 * 1024 * 1024;
+                            break;
                         case 'm':
-                            $value *= 1024;
-                        // no break (cumulative multiplier)
+                            $value *= 1024 * 1024;
+                            break;
                         case 'k':
                             $value *= 1024;
+                            break;
                     }
 
                     return $value;
