@@ -2,7 +2,6 @@
 
 <phpunit backupGlobals="false"
          backupStaticAttributes="false"
-         strict="false"
          verbose="true"
          bootstrap="tests/bootstrap.php"
 >
