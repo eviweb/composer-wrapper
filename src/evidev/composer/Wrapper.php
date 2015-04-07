@@ -226,10 +226,24 @@ final class Wrapper
         $cli_args = is_string($input) && !empty($input) ?
                 new \Symfony\Component\Console\Input\StringInput($input) :
                 null;
+        
+        $this->fixSelfupdate($cli_args);
 
         return $this->application->run(
             $cli_args,
             $output
         );
+    }
+    
+    /**
+     * fix selfupdate issue
+     * 
+     * @see https://github.com/eviweb/composer-wrapper/issues/5
+     */
+    private function fixSelfupdate($cli_args)
+    {
+        if (preg_match('/self-?update/', $cli_args)) {
+            $_SERVER['argv'][0] = $this->composer;
+        }
     }
 }
