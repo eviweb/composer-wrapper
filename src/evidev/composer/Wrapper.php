@@ -75,7 +75,7 @@ final class Wrapper
      * or force a fresh composer install.
      *
      * @param boolean $force TRUE to re-download composer.phar even if a valid
-     *    file already exists.
+     *                       file already exists.
      */
     public function loadComposerPhar($force = true)
     {
@@ -96,6 +96,7 @@ final class Wrapper
                     "and that your server has a working internet connection " .
                     "allowing outbound HTTPS connections.",
                     E_USER_WARNING);
+
             return false;
         }
         if (empty($phar)) {
@@ -104,6 +105,7 @@ final class Wrapper
                     "There is no way this can work, but I don't know what " .
                     " to do about it.",
                     E_USER_WARNING);
+
             return false;
         }
         $bytes_written = file_put_contents($this->composer, $phar);
@@ -111,6 +113,7 @@ final class Wrapper
             trigger_error(
                     "Failed to write downloaded PHAR. ",
                     E_USER_WARNING);
+
             return false;
         }
 
@@ -121,7 +124,8 @@ final class Wrapper
      * Check whether the current setup meets the minimum memory requirements
      * for composer; raise a notice if not.
      */
-    private function checkMemoryLimit() {
+    private function checkMemoryLimit()
+    {
         if (function_exists('ini_get')) {
             /**
              * Note that this calculation is incorrect for memory limits that
@@ -165,7 +169,7 @@ final class Wrapper
     /**
      * constructor
      *
-     * @param   string  $directory  target directory where to copy composer.phar
+     * @param string $directory target directory where to copy composer.phar
      */
     private function __construct($directory)
     {
@@ -193,26 +197,27 @@ final class Wrapper
     /**
      * Factory method.
      *
-     * @param   string  $directory  target directory where to copy composer.phar
-     *                              if it is not provided or if the directory
-     *                              does not exist, it is initialized using
-     *                              sys_get_temp_dir()
-     * @return \evidev\composer\Wrapper
+     * @param  string  $directory target directory where to copy composer.phar
+     *                            if it is not provided or if the directory
+     *                            does not exist, it is initialized using
+     *                            sys_get_temp_dir()
+     * @return Wrapper
      */
     public static function create($directory = '')
     {
         if (empty($directory) || !file_exists($directory)) {
             $directory = sys_get_temp_dir();
         }
+
         return new Wrapper($directory);
     }
 
     /**
      * Run this composer wrapper as a command-line application.
      *
-     * @param   string  $input  command line arguments
-     * @param   object  $output output object
-     * @return  integer 0 if everything went fine, or an error code
+     * @param  string  $input  command line arguments
+     * @param  object  $output output object
+     * @return integer 0 if everything went fine, or an error code
      * @see http://api.symfony.com/2.2/Symfony/Component/Console/Application.html#method_run
      */
     public function run($input = '', $output = null)
@@ -226,7 +231,7 @@ final class Wrapper
         $cli_args = is_string($input) && !empty($input) ?
                 new \Symfony\Component\Console\Input\StringInput($input) :
                 null;
-        
+
         $this->fixSelfupdate($cli_args);
 
         return $this->application->run(
@@ -234,10 +239,10 @@ final class Wrapper
             $output
         );
     }
-    
+
     /**
      * fix selfupdate issue
-     * 
+     *
      * @see https://github.com/eviweb/composer-wrapper/issues/5
      */
     private function fixSelfupdate($cli_args)
