@@ -23,16 +23,18 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- * 
- * @author	Eric VILLARD <dev@eviweb.fr>
- * @copyright	(c) 2013 Eric VILLARD <dev@eviweb.fr>
+ *
+ * @author      Eric VILLARD <dev@eviweb.fr>
+ * @copyright   (c) 2013 Eric VILLARD <dev@eviweb.fr>
  */
 
 error_reporting(E_ALL);
 
+require_once __DIR__.'/../vendor/autoload.php';
+
 /**
  * autoloader
- * 
+ *
  * @param string $class
  * @return boolean
  */
@@ -51,6 +53,7 @@ function evitest_cw_autoload($class)
     if ($i < $l) {
         return require_once($paths[$i] . DIRECTORY_SEPARATOR . $filename);
     }
+
     return false;
 }
 spl_autoload_register('evitest_cw_autoload');
