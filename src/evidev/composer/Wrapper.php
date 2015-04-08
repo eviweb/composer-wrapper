@@ -189,8 +189,8 @@ final class Wrapper
 
         $this->checkMemoryLimit();
 
-        if (!function_exists('includeIfExists')) {
-            require_once 'phar://' . $this->composer . '/src/bootstrap.php';
+        if (!class_exists('\Composer\Console\Application')) {
+            require_once 'phar://' . $this->composer . '/vendor/autoload.php';
         }
     }
 
