@@ -232,12 +232,16 @@ final class Wrapper
                 new \Symfony\Component\Console\Input\StringInput($input) :
                 null;
 
+        $argv0 = $_SERVER['argv'][0];
         $this->fixSelfupdate($cli_args);
 
-        return $this->application->run(
+        $exitcode = $this->application->run(
             $cli_args,
             $output
         );
+        $_SERVER['argv'][0] = $argv0;
+
+        return $exitcode;
     }
 
     /**

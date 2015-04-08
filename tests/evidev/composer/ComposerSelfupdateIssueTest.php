@@ -32,6 +32,9 @@
 
 namespace evidev\composer\test;
 
+use evidev\composer\Wrapper;
+use PHPUnit_Framework_TestCase;
+
 /**
  * ComposerSelfupdateIssueTest
  *
@@ -40,21 +43,21 @@ namespace evidev\composer\test;
  * @copyright   (c) 2015 Eric VILLARD <dev@eviweb.fr>
  * @license     http://opensource.org/licenses/MIT MIT License
  */
-class ComposerSelfupdateIssueTest extends \PHPUnit_Framework_TestCase
+class ComposerSelfupdateIssueTest extends PHPUnit_Framework_TestCase
 {
     /**
      * associative array of needed files
      *
      * @var array
      */
-    protected static $files;
+    protected $files;
 
     /**
      * initializes the test environment
      */
-    public static function setUpBeforeClass()
+    public function setUp()
     {
-        static::$files = array(
+        $this->files = array(
             'composer'      => sys_get_temp_dir().'/composer.phar',
             'selfupdater'   => sys_get_temp_dir().'/composerselfupdateissuetest.php',
         );
@@ -63,9 +66,9 @@ class ComposerSelfupdateIssueTest extends \PHPUnit_Framework_TestCase
     /**
      * clears the test environment
      */
-    public static function tearDownAfterClass()
+    public function tearDown()
     {
-        foreach (static::$files as $file) {
+        foreach ($this->files as $file) {
             if (file_exists($file)) {
                 unlink($file);
             }
@@ -80,17 +83,28 @@ class ComposerSelfupdateIssueTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->copyComposer());
         $this->assertTrue($this->createSelfupdater());
 
-        $result = $this->executeScript(static::$files['selfupdater']);
+        $result = $this->executeScript($this->files['selfupdater']);
 
         $this->assertEquals(0, $result['status']);
         $this->assertEquals(
             $this->getSelfupdaterContent(),
-            file_get_contents(static::$files['selfupdater'])
+            file_get_contents($this->files['selfupdater'])
         );
         $this->assertNotEquals(
             $this->executeScript($this->getComposerFixurePath(), '-V'),
-            $this->executeScript(static::$files['composer'], '-V')
+            $this->executeScript($this->files['composer'], '-V')
         );
+    }
+
+    /**
+     * @see https://github.com/eviweb/composer-wrapper/issues/7
+     */
+    public function testSelfupdateFixMustAlterHostScriptReferenceOnlyTemporarily()
+    {
+        $argv0 = $_SERVER['argv'][0];
+        Wrapper::create(dirname($this->files['composer']))->run('self-update');
+
+        $this->assertEquals($argv0, $_SERVER['argv'][0]);
     }
 
     /**
@@ -101,7 +115,7 @@ class ComposerSelfupdateIssueTest extends \PHPUnit_Framework_TestCase
     private function createSelfupdater()
     {
         return file_put_contents(
-            static::$files['selfupdater'],
+            $this->files['selfupdater'],
             $this->getSelfupdaterContent()
         ) !== false;
     }
@@ -178,6 +192,6 @@ FILE;
         $path = $this->getComposerFixurePath();
         assert(file_exists($path), "Composer fixture should be found at: $path");
 
-        return copy($path, self::$files['composer']);
+        return copy($path, $this->files['composer']);
     }
 }
