@@ -34,6 +34,7 @@ namespace evidev\composer\test;
 
 use evidev\composer\Wrapper;
 use PHPUnit_Framework_TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * ComposerSelfupdateIssueTest
@@ -53,14 +54,25 @@ class ComposerSelfupdateIssueTest extends PHPUnit_Framework_TestCase
     protected $files;
 
     /**
+     * test directory
+     *
+     * @var string
+     */
+    protected $testdir;
+
+    /**
      * initializes the test environment
      */
     public function setUp()
     {
+        $this->testdir = sys_get_temp_dir().'/composerselfupdateissuetest';
         $this->files = array(
-            'composer'      => sys_get_temp_dir().'/composer.phar',
-            'selfupdater'   => sys_get_temp_dir().'/composerselfupdateissuetest.php',
+            'composer'      => $this->testdir.'/composer.phar',
+            'selfupdater'   => $this->testdir.'/composerselfupdateissuetest.php',
+            'json'          => $this->testdir.'/composer.json'
         );
+        
+        (new Filesystem())->mkdir($this->testdir);
     }
 
     /**
@@ -68,11 +80,7 @@ class ComposerSelfupdateIssueTest extends PHPUnit_Framework_TestCase
      */
     public function tearDown()
     {
-        foreach ($this->files as $file) {
-            if (file_exists($file)) {
-                unlink($file);
-            }
-        }
+        (new Filesystem())->remove($this->testdir);
     }
 
     /**
@@ -105,6 +113,33 @@ class ComposerSelfupdateIssueTest extends PHPUnit_Framework_TestCase
         Wrapper::create(dirname($this->files['composer']))->run('self-update');
 
         $this->assertEquals($argv0, $_SERVER['argv'][0]);
+    }
+
+    /**
+     * @see https://github.com/eviweb/composer-wrapper/issues/8
+     */
+    public function testSelfupdateShouldNotMakeNextActionToFailWithTheSameInstance()
+    {
+        (new Filesystem())->dumpFile($this->files['json'], '{"name":"test/fixture", "description":""}');
+        $directory = dirname($this->files['composer']);
+        $this->assertTrue($this->copyComposer());
+        $wrapper =  Wrapper::create($directory);
+
+        $this->assertEquals(0, $wrapper->run('self-update -q'));
+        $this->assertEquals(0, $wrapper->run('-d="'.$directory.'" update'));
+    }
+    
+    /**
+     * @see https://github.com/eviweb/composer-wrapper/issues/8
+     */
+    public function testSelfupdateShouldNotMakeNextActionToFailWithDifferentInstances()
+    {
+        (new Filesystem())->dumpFile($this->files['json'], '{"name":"test/fixture", "description":""}');
+        $directory = dirname($this->files['composer']);
+        $this->assertTrue($this->copyComposer());
+        
+        $this->assertEquals(0, Wrapper::create($directory)->run('self-update -q'));
+        $this->assertEquals(0, Wrapper::create($directory)->run('-d="'.$directory.'" update'));
     }
 
     /**
