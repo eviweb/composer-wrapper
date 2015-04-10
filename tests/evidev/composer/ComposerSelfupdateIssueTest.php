@@ -69,7 +69,8 @@ class ComposerSelfupdateIssueTest extends PHPUnit_Framework_TestCase
         $this->files = array(
             'composer'      => $this->testdir.'/composer.phar',
             'selfupdater'   => $this->testdir.'/composerselfupdateissuetest.php',
-            'json'          => $this->testdir.'/composer.json'
+            'json'          => $this->testdir.'/composer.json',
+            'stream'        => $this->testdir.'/wrapper-unittest.stream',
         );
 
         (new Filesystem())->mkdir($this->testdir);
@@ -128,9 +129,11 @@ class ComposerSelfupdateIssueTest extends PHPUnit_Framework_TestCase
         $directory = dirname($this->files['composer']);
         $this->assertTrue($this->copyComposer());
         $wrapper =  Wrapper::create($directory);
+        $version = $this->runAndGetOutput($wrapper, '-V');
 
         $this->assertEquals(0, $wrapper->run('self-update -q'));
         $this->assertEquals(0, $wrapper->run('-d="'.$directory.'" update'));
+        $this->assertNotEquals($version, $this->runAndGetOutput($wrapper, '-V'));
     }
 
     /**
@@ -236,5 +239,23 @@ FILE;
         assert(file_exists($path), "Composer fixture should be found at: $path");
 
         return copy($path, $this->files['composer']);
+    }
+
+    /**
+     * run a command and get its output
+     *
+     * @param  Wrapper $wrapper wrapper instance
+     * @param  type    $command command to run and get the output
+     * @return string  returns the command output
+     */
+    private function runAndGetOutput(Wrapper $wrapper, $command)
+    {
+        $file = $this->files['stream'];
+        $rs = fopen($file, 'w', false);
+        $stream = new \Symfony\Component\Console\Output\StreamOutput($rs);
+        $wrapper->run($command, $stream);
+        fclose($rs);
+
+        return file_get_contents($file);
     }
 }
