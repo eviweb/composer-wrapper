@@ -71,7 +71,7 @@ class ComposerSelfupdateIssueTest extends PHPUnit_Framework_TestCase
             'selfupdater'   => $this->testdir.'/composerselfupdateissuetest.php',
             'json'          => $this->testdir.'/composer.json'
         );
-        
+
         (new Filesystem())->mkdir($this->testdir);
     }
 
@@ -120,7 +120,11 @@ class ComposerSelfupdateIssueTest extends PHPUnit_Framework_TestCase
      */
     public function testSelfupdateShouldNotMakeNextActionToFailWithTheSameInstance()
     {
-        (new Filesystem())->dumpFile($this->files['json'], '{"name":"test/fixture", "description":""}');
+        (new Filesystem())->copy(
+            str_replace('.phar', '.json', $this->getComposerFixurePath()),
+            $this->files['json'],
+            true
+        );
         $directory = dirname($this->files['composer']);
         $this->assertTrue($this->copyComposer());
         $wrapper =  Wrapper::create($directory);
@@ -128,16 +132,20 @@ class ComposerSelfupdateIssueTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $wrapper->run('self-update -q'));
         $this->assertEquals(0, $wrapper->run('-d="'.$directory.'" update'));
     }
-    
+
     /**
      * @see https://github.com/eviweb/composer-wrapper/issues/8
      */
     public function testSelfupdateShouldNotMakeNextActionToFailWithDifferentInstances()
     {
-        (new Filesystem())->dumpFile($this->files['json'], '{"name":"test/fixture", "description":""}');
+        (new Filesystem())->copy(
+            str_replace('.phar', '.json', $this->getComposerFixurePath()),
+            $this->files['json'],
+            true
+        );
         $directory = dirname($this->files['composer']);
         $this->assertTrue($this->copyComposer());
-        
+
         $this->assertEquals(0, Wrapper::create($directory)->run('self-update -q'));
         $this->assertEquals(0, Wrapper::create($directory)->run('-d="'.$directory.'" update'));
     }

@@ -1,0 +1,12 @@
+{
+    "name": "test/fixture",
+    "description": "",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "John Doe",
+            "email": "john@doe.com"
+        }
+    ],
+    "require": {}
+}
