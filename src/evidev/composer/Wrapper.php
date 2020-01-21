@@ -155,7 +155,7 @@ final class Wrapper
 
             $memoryLimit = trim(ini_get('memory_limit'));
             // Increase memory_limit if it is lower than 512M
-            if ($memoryLimit != -1 && $memoryInBytes($memoryLimit) < 512 * 1024 * 1024) {
+            if ($memoryLimit != -1 && $memoryInBytes($memoryLimit) < 512 * 1024 * 1024 && ini_set('memory_limit', '512M') === false) {
                 trigger_error("Configured memory limit ($memoryLimit) is lower " .
                               "than 512M; composer-wrapper may not work " .
                               "correctly. Consider increasing PHP's " .
