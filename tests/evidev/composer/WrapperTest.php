@@ -130,7 +130,7 @@ class WrapperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $cw->run("-V", $stream));
         fclose($rs);
         $this->assertTrue(
-            (boolean) preg_match('/^Composer version/', file_get_contents($file))
+            (boolean) preg_match('/Composer version/', file_get_contents($file))
         );
     }
     
@@ -147,7 +147,7 @@ class WrapperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $cw->run("", $stream));
         fclose($rs);
         $this->assertTrue(
-            (boolean) preg_match('/^Composer version/', file_get_contents($file))
+            (boolean) preg_match('/Composer version/', file_get_contents($file))
         );
     }
 }
