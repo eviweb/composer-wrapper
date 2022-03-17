@@ -20,42 +20,37 @@ How to use :
 First, you need to include the wrapper into your code,
 according to the previous installation choice :    
     
-1.    add ```
-require_once 'PATH_TO_COMPOSER_WRAPPER_DIRECTORY/src/evidev/composer/Wrapper.php';
-``` where _PATH_TO_COMPOSER_WRAPPER_DIRECTORY_ is the path to the cloned repository    
-2.    add ```
-require 'vendor/autoload.php';
-``` please refer to the [Composer Documentation](http://getcomposer.org/doc/00-intro.md#autoloading)    
-3.    add ```
-require_once 'PATH_TO_COMPOSER_WRAPPER_FILE';
-``` where _PATH_TO_COMPOSER_WRAPPER_FILE_ is the path to the _Wrapper.php_ file    
+1.    add `require_once 'PATH_TO_COMPOSER_WRAPPER_DIRECTORY/src/evidev/composer/Wrapper.php';` where _PATH_TO_COMPOSER_WRAPPER_DIRECTORY_ is the path to the cloned repository    
+2.    add `require 'vendor/autoload.php';` please refer to the [Composer Documentation](http://getcomposer.org/doc/00-intro.md#autoloading)    
+3.    add `require_once 'PATH_TO_COMPOSER_WRAPPER_FILE';` where _PATH_TO_COMPOSER_WRAPPER_FILE_ is the path to the _Wrapper.php_ file    
 4.    add    
-    
->        $wrapper_file = sys_get_temp_dir() . '/Wrapper.php';
->        if (!file_exists($wrapper_file)) {
->             file_put_contents(
->                 $wrapper_file,
->                 file_get_contents('https://raw.github.com/eviweb/composer-wrapper/master/src/evidev/composer/Wrapper.php')
->             );
->        }
->        require_once $wrapper_file;    
-     
+```php
+$wrapper_file = sys_get_temp_dir() . '/Wrapper.php';
+if (!file_exists($wrapper_file)) {
+    file_put_contents(
+        $wrapper_file,
+        file_get_contents('https://raw.github.com/eviweb/composer-wrapper/master/src/evidev/composer/Wrapper.php')
+    );
+}
+require_once $wrapper_file;    
+```
      
 ### Use the wrapper
-1.    for a command line use, simply add ```exit(\evidev\composer\Wrapper::create()->run());``` to your executable script    
+1.    for a command line use, simply add `exit(\evidev\composer\Wrapper::create()->run());` to your executable script    
 2.    if you want to use it in the body of your script, and pass specific arguments to the _Wrapper::run()_ method you need to do as the following :    
-    
->        $wc = \evidev\composer\Wrapper::create();
->        $exit_code = $wc->run("COMPOSER_OPTION_OR_COMMAND_AS_STRING");
->        // add more code here for example
->        exit($exit_code);    
+```php
+$wc = \evidev\composer\Wrapper::create();
+$exit_code = $wc->run("COMPOSER_OPTION_OR_COMMAND_AS_STRING");
+// add more code here for example
+exit($exit_code);
+```
      
 where _COMPOSER_OPTION_OR_COMMAND_AS_STRING_ is a composer option or command
      
 ### How it works    
-The Wrapper downloads the ```composer.phar``` file when created.    
-By default the ```composer.phar``` is downloaded in ```sys_get_temp_dir()```, but you can specify a target directory 
-by passing its path as a parameter of ```Wrapper::create()```.    
-If this parameter is an empty string or if the directory does not exist, ```sys_get_temp_dir()``` is used as fallback    
+The Wrapper downloads the `composer.phar` file when created.    
+By default the `composer.phar` is downloaded in `sys_get_temp_dir()`, but you can specify a target directory 
+by passing its path as a parameter of `Wrapper::create()`.    
+If this parameter is an empty string or if the directory does not exist, `sys_get_temp_dir()` is used as fallback    
 In case of use of many instances of the Wrapper, created with different directories _(which should never happened)_, 
-the first downloaded ```composer.phar``` is used.    
+the first downloaded `composer.phar` is used.    
